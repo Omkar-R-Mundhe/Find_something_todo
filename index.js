@@ -25,27 +25,50 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.post("/new", async (req, res) => {
-  // console.log(req.body);
-  const choice=req.body
-  console.log(choice)
+// app.post("/new", async (req, res) => {
+//   // console.log(req.body);
+//   const choice=req.body
+//   console.log(choice)
   
 
-  try {
-    const response = await axios.get(`https://bored-api.appbrewery.com/filter?type=${choice.type}&&participants=${choice.participants}`);
-    const result = response.data;
-    // console.log(result[0])
-    // console.log(result.length)
-    console.log(result)
-    const randomNumber=Math.floor(Math.random() * result.length);
+//   try {
+//     const response = await axios.get(`https://bored-api.appbrewery.com/filter?type=${choice.type}&&participants=${choice.participants}`);
+//     // await pauses the execution of the surrounding async function until the promise is settled (either fulfilled or rejected).
 
-    res.render("index.ejs", { data: result[randomNumber] });
-  } catch (error) {
-    console.error("Failed to make request:", error.message);
-    res.render("index.ejs", {
-      error: error.message,
+//     const result = response.data;
+//     // console.log(result[0])
+//     // console.log(result.length)
+//     console.log(result)
+//     const randomNumber=Math.floor(Math.random() * result.length);
+
+//     res.render("index.ejs", { data: result[randomNumber] });
+//   } catch (error) {
+//     console.error("Failed to make request:", error.message);
+//     res.render("index.ejs", {
+//       error: error.message,
+//     });
+//   }
+
+
+app.post("/new", (req, res) => {
+  const choice = req.body;
+  console.log(choice);
+
+  axios.get(`https://bored-api.appbrewery.com/filter?type=${choice.type}&&participants=${choice.participants}`)
+    .then(response => {
+      const result = response.data;
+      console.log(result);
+      const randomNumber = Math.floor(Math.random() * result.length);
+      res.render("index.ejs", { data: result[randomNumber] });
+    })
+    .catch(error => {
+      console.error("Failed to make request:", error.message);
+      res.render("index.ejs", {
+        error: error.message,
+      });
     });
-  }
+});
+
 
   // Step 2: Play around with the drop downs and see what gets logged.
   // Use axios to make an API request to the /filter endpoint. Making
@@ -55,7 +78,7 @@ app.post("/new", async (req, res) => {
   // Step 3: If you get a 404 error (resource not found) from the API request.
   // Pass an error to the index.ejs to tell the user:
   // "No activities that match your criteria."
-});
+// });
 
 app.listen(port, () => {
   console.log(`Server running on port: ${port}`);
